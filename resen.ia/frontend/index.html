@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>TutorBot</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+    }
+
+    .chat {
+      width: 400px;
+      margin-top: 20px;
+      border: 1px solid #333;
+      padding: 10px;
+      background: #1a1a1a;
+    }
+
+    .messages {
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+
+    .msg {
+      margin: 5px 0;
+    }
+
+    .user {
+      text-align: right;
+      color: #00ff88;
+    }
+
+    .bot {
+      text-align: left;
+      color: #00cfff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 50px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      background: #00ff88;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat">
+  <h3>TutorBot 🤖</h3>
+
+  <div class="messages" id="messages"></div>
+
+  <textarea id="input" placeholder="Digite sua dúvida..."></textarea>
+  <button onclick="enviar()">Enviar</button>
+</div>
+
+<script>
+  const messages = document.getElementById('messages');
+  const input = document.getElementById('input');
+
+  function addMsg(texto, tipo) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + tipo;
+    div.textContent = texto;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  async function enviar() {
+    const texto = input.value.trim();
+    if (!texto) return;
+
+    addMsg(texto, 'user');
+    input.value = '';
+
+    try {
+      const res = await fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensagem: texto })
+      });
+
+      const data = await res.json();
+      addMsg(data.resposta, 'bot');
+
+    } catch (erro) {
+      addMsg('Erro ao conectar', 'bot');
+    }
+  }
+</script>
+
+</body>
+</html>
